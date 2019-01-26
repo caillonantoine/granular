@@ -1,4 +1,5 @@
 #include "m_pd.h"
+#include "granular_engine.h"
 #include "AudioFile.h"
 
 static t_class *granular_tilde_class;
@@ -6,7 +7,7 @@ static t_class *granular_tilde_class;
 typedef struct _granular_tilde {
   t_object  x_obj;
 
-  AudioFile<float> sample;
+  GranularEngine GE;
 
   t_outlet*x_out;
 
@@ -27,6 +28,11 @@ void granular_tilde_dsp(t_granular_tilde *x, t_signal **sp)
 {
   dsp_add(granular_tilde_perform, 3, x,
           sp[0]->s_vec, sp[0]->s_n);
+}
+
+void granular_tilde_load(t_granular_tilde *x, t_symbol *sym)
+{
+  x->GE = GranularEngine(sym->s_name);
 }
 
 void granular_tilde_free(t_granular_tilde *x)
@@ -53,5 +59,7 @@ void granular_tilde_setup(void) {
 
   class_addmethod(granular_tilde_class,
         (t_method)granular_tilde_dsp, gensym("dsp"), A_CANT, 0);
+  class_addmethod(granular_tilde_class,
+        (t_method)granular_tilde_load, gensym("load"), A_SYMBOL, A_NULL);
 }
 }
