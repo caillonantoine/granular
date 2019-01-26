@@ -5,10 +5,10 @@
 class GranularEngine
 {
 public:
-  GranularEngine(std::string filename);
-  float* getNextGrain(int hop, int N);
+  GranularEngine(const std::string filename);
+  float* getNextGrain(const int hop, const int N);
 
 private:
   int m_currentPosition;
-  AudioFile<float>m_audio;
+  AudioFile<float> m_audio;
 };
