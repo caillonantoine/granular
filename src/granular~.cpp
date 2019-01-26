@@ -9,7 +9,17 @@ typedef struct _granular_tilde {
 
   GranularEngine GE;
 
+  float* grain[4];
+  int    grainHead[4];
+  int    grainSize[4];
+  int    nextGrainSlot;
+
+  int      hopHead;
+  float    playHopSize;
+
+  t_inlet* x_in_play_hop_size;
   t_outlet*x_out;
+
 
 } t_granular_tilde;
 
@@ -19,7 +29,30 @@ t_int *granular_tilde_perform(t_int *w)
   t_sample  *out =    (t_sample *)(w[2]);
   int          n =           (int)(w[3]);
 
-  while (n--) *out++ = 0;
+  for (int i(0); i < n; i++)
+  {
+    out[i] = 0;
+    if (x->hopHead++ >= int(x->playHopSize))
+    {
+      x->hopHead = 0;
+      //Donc si la tete de lecture passe le seuil du play hop size, on demande au
+      //GE un nouveau grain dont le premier élement doit être mis dans
+      //x->grain[nextGrainSlot] = GE.getNextGrain(readHopSize, grainSize); et
+      //mettre a grainSize la valeur de x->grainSize adéquate, mettre x->grainHead à 0 et
+      //incrémenter nextGrainSlot.
+      x->grain[x->nextGrainSlot]     = x->GE.getNextGrain(256, 8192);
+      x->grainHead[x->nextGrainSlot] = 0;
+      x->grainSize[x->nextGrainSlot] = 8192;
+      x->nextGrainSlot = (x->nextGrainSlot + 1) % 4;
+    }
+    for (int g(0); g < 4; g++)
+    {
+      //Pour chaque grain on ajoute la valeur correspondane, et on incrémente grainHead
+      out[i] += x->grainHead[g] >= x->grainSize[g]? 0 : x->grain[g][x->grainHead[g]++];
+    }
+  }
+
+
 
   return (w+4);
 }
@@ -44,6 +77,14 @@ void *granular_tilde_new(t_floatarg f)
 {
   t_granular_tilde *x = (t_granular_tilde *)pd_new(granular_tilde_class);
 
+  *x->grainHead = {0};
+  *x->grainSize = {0};
+  x->nextGrainSlot = 0;
+
+  x->hopHead = 0;
+  x->playHopSize = 4096;
+
+  x->x_in_play_hop_size = floatinlet_new (&x->x_obj, &x->playHopSize);
   x->x_out=outlet_new(&x->x_obj, &s_signal);
 
   return (void *)x;
