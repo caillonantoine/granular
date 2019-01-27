@@ -6,7 +6,8 @@
 class GranularEngine
 {
 public:
-  GranularEngine(const std::string filename);
+  GranularEngine();
+  void loadFile(const std::string filename);
   float* getNextGrain(const int hop, const int N);
   float window[WINDOW_LUT_SIZE];
 

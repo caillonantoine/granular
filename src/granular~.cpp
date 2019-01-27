@@ -71,7 +71,7 @@ void granular_tilde_dsp(t_granular_tilde *x, t_signal **sp)
 
 void granular_tilde_load(t_granular_tilde *x, t_symbol *sym)
 {
-  x->GE = GranularEngine(sym->s_name);
+  x->GE.loadFile(sym->s_name);
 }
 
 void granular_tilde_free(t_granular_tilde *x)
@@ -82,6 +82,8 @@ void granular_tilde_free(t_granular_tilde *x)
 void *granular_tilde_new(t_floatarg f)
 {
   t_granular_tilde *x = (t_granular_tilde *)pd_new(granular_tilde_class);
+
+  x->GE = GranularEngine();
 
   *x->grainHead = {0};
   *x->grainSize = {0};
