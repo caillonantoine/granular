@@ -16,8 +16,12 @@ typedef struct _granular_tilde {
 
   int      hopHead;
   float    playHopSize;
+  float    readHopSize;
+  float    currentGrainSize;
 
   t_inlet* x_in_play_hop_size;
+  t_inlet* x_in_read_hop_size;
+  t_inlet* x_in_current_grain_size;
   t_outlet*x_out;
 
 
@@ -32,7 +36,7 @@ t_int *granular_tilde_perform(t_int *w)
   for (int i(0); i < n; i++)
   {
     out[i] = 0;
-    if (x->hopHead++ >= int(x->playHopSize))
+    if (x->hopHead++ >= int(std::max(x->currentGrainSize / 4, x->playHopSize)))
     {
       x->hopHead = 0;
       //Donc si la tete de lecture passe le seuil du play hop size, on demande au
@@ -40,7 +44,7 @@ t_int *granular_tilde_perform(t_int *w)
       //x->grain[nextGrainSlot] = GE.getNextGrain(readHopSize, grainSize); et
       //mettre a grainSize la valeur de x->grainSize adéquate, mettre x->grainHead à 0 et
       //incrémenter nextGrainSlot.
-      x->grain[x->nextGrainSlot]     = x->GE.getNextGrain(256, 8192);
+      x->grain[x->nextGrainSlot]     = x->GE.getNextGrain(int(x->readHopSize), int(x->currentGrainSize));
       x->grainHead[x->nextGrainSlot] = 0;
       x->grainSize[x->nextGrainSlot] = 8192;
       x->nextGrainSlot = (x->nextGrainSlot + 1) % 4;
@@ -83,8 +87,12 @@ void *granular_tilde_new(t_floatarg f)
 
   x->hopHead = 0;
   x->playHopSize = 4096;
+  x->readHopSize = 256;
+  x->currentGrainSize = 4096;
 
   x->x_in_play_hop_size = floatinlet_new (&x->x_obj, &x->playHopSize);
+  x->x_in_read_hop_size = floatinlet_new(&x->x_obj, &x->readHopSize);
+  x->x_in_current_grain_size = floatinlet_new(&x->x_obj, &x->currentGrainSize);
   x->x_out=outlet_new(&x->x_obj, &s_signal);
 
   return (void *)x;
