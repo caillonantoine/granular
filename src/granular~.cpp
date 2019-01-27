@@ -46,13 +46,15 @@ t_int *granular_tilde_perform(t_int *w)
       //incrémenter nextGrainSlot.
       x->grain[x->nextGrainSlot]     = x->GE.getNextGrain(int(x->readHopSize), int(x->currentGrainSize));
       x->grainHead[x->nextGrainSlot] = 0;
-      x->grainSize[x->nextGrainSlot] = 8192;
+      x->grainSize[x->nextGrainSlot] = x->currentGrainSize;
       x->nextGrainSlot = (x->nextGrainSlot + 1) % 4;
     }
     for (int g(0); g < 4; g++)
     {
       //Pour chaque grain on ajoute la valeur correspondane, et on incrémente grainHead
-      out[i] += x->grainHead[g] >= x->grainSize[g]? 0 : x->grain[g][x->grainHead[g]++];
+      out[i] += x->grainHead[g] >= x->grainSize[g]? 0 :
+              x->grain[g][x->grainHead[g]] * x->GE.window[(WINDOW_LUT_SIZE * x->grainHead[g]) / x->grainSize[g]];
+      x->grainHead[g] ++;
     }
   }
 
