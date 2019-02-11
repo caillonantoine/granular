@@ -1,6 +1,7 @@
 #include "m_pd.h"
 #include "granular_engine.h"
 #include "AudioFile.h"
+#include <iostream>
 
 static t_class *granular_tilde_class;
 
@@ -74,6 +75,11 @@ void granular_tilde_load(t_granular_tilde *x, t_symbol *sym)
   x->GE.loadFile(sym->s_name);
 }
 
+void granular_tilde_freeze(t_granular_tilde *x, t_symbol *sym)
+{
+  x->GE.toogle_freeze();
+}
+
 void granular_tilde_free(t_granular_tilde *x)
 {
   outlet_free(x->x_out);
@@ -114,5 +120,7 @@ void granular_tilde_setup(void) {
         (t_method)granular_tilde_dsp, gensym("dsp"), A_CANT, 0);
   class_addmethod(granular_tilde_class,
         (t_method)granular_tilde_load, gensym("load"), A_SYMBOL, A_NULL);
+  class_addmethod(granular_tilde_class,
+        (t_method)granular_tilde_freeze, gensym("freeze"), A_DEFFLOAT, 0);
 }
 }
