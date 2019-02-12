@@ -3,8 +3,12 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define SPREAD 256
+
+//==============================================================================
+
 GranularEngine::GranularEngine() :
-m_currentPosition(0), m_freeze(0)
+m_currentPosition(0), m_freeze(0), m_ready(0)
 {
   for (int i(0); i < WINDOW_LUT_SIZE; i++)
   {
@@ -12,6 +16,7 @@ m_currentPosition(0), m_freeze(0)
   }
 }
 
+//==============================================================================
 
 float* GranularEngine::getNextGrain(const int hop, const int N)
 {
@@ -22,16 +27,23 @@ float* GranularEngine::getNextGrain(const int hop, const int N)
         return &m_audio.samples[0][m_currentPosition];
 
       case 1:
-        return &m_audio.samples[0][std::max(0,m_currentPosition + std::rand()%1024)];
+        return &m_audio.samples[0][std::max(0,m_currentPosition + std::rand()%SPREAD - SPREAD/2)];
   }
 }
 
+//==============================================================================
 
 void GranularEngine::loadFile(const std::string filename)
 {
-  m_audio.load(filename);
-  m_audio.printSummary();
+  if (m_audio.load(filename))
+  {
+      m_audio.printSummary();
+      m_ready = 1;
+  }
+
 }
+
+//==============================================================================
 
 void GranularEngine::toogle_freeze()
 {

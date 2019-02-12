@@ -33,10 +33,10 @@ t_int *granular_tilde_perform(t_int *w)
   t_granular_tilde *x = (t_granular_tilde *)(w[1]);
   t_sample  *out =    (t_sample *)(w[2]);
   int          n =           (int)(w[3]);
-
   for (int i(0); i < n; i++)
   {
     out[i] = 0;
+    if (x->GE.m_ready) {
     if (x->hopHead++ >= int(std::max(x->currentGrainSize / 4, x->playHopSize)))
     {
       x->hopHead = 0;
@@ -57,6 +57,7 @@ t_int *granular_tilde_perform(t_int *w)
               x->grain[g][x->grainHead[g]] * x->GE.window[(WINDOW_LUT_SIZE * x->grainHead[g]) / x->grainSize[g]];
       x->grainHead[g] ++;
     }
+}
   }
 
 
