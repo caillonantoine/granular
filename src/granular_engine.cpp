@@ -18,16 +18,21 @@ m_currentPosition(0), m_freeze(0), m_ready(0)
 
 //==============================================================================
 
-float* GranularEngine::getNextGrain(const int hop, const int N)
+void GranularEngine::getNextGrain(const int hop,
+                                  const int N,
+                                  float **grainL,
+                                  float **grainR)
 {
   switch (m_freeze) {
       case 0:
         m_currentPosition = (m_currentPosition + N + hop > m_audio.getNumSamplesPerChannel())? 0 :
                             std::max(0, m_currentPosition + hop);
-        return &m_audio.samples[0][m_currentPosition];
+        *grainL = &m_audio.samples[0][m_currentPosition];
+        *grainR = &m_audio.samples[1][m_currentPosition];
 
       case 1:
-        return &m_audio.samples[0][std::max(0,m_currentPosition + std::rand()%SPREAD - SPREAD/2)];
+        *grainL = &m_audio.samples[0][std::max(0,m_currentPosition + std::rand()%SPREAD - SPREAD/2)];
+        *grainR = &m_audio.samples[1][std::max(0,m_currentPosition + std::rand()%SPREAD - SPREAD/2)];
   }
 }
 
@@ -35,6 +40,7 @@ float* GranularEngine::getNextGrain(const int hop, const int N)
 
 void GranularEngine::loadFile(const std::string filename)
 {
+  m_ready = 0;
   if (m_audio.load(filename))
   {
       m_audio.printSummary();
