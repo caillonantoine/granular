@@ -62,7 +62,7 @@
 #X obj 46 100 abs;
 #X msg 108 490 pin 0;
 #X msg 110 544 goto 0;
-#X msg 417 308 load /home/antoine/dev/MODULAIRE/SAMPLES/kalimba.wav
+#X msg 417 308 load kalimba.wav
 ;
 #X connect 0 0 2 0;
 #X connect 0 1 1 1;
