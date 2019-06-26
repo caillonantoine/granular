@@ -10,7 +10,7 @@ mkdir build && cd build && cmake .. && make
 And then run it with
 
 ```bash
-pd -nogui -path build granular.pd
+pd -path build granular.pd
 ```
 
 By default, it loads `kalimba.wav` and takes input 48 - 51 from a MIDI controller to modify
